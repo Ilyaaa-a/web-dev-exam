@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Написать рецензию — {{ book.title }}{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+{% endblock %}
+
+{% block content %}
+<h1 class="mb-1">Написать рецензию</h1>
+<p class="text-muted mb-4">Книга: «{{ book.title }}»</p>
+
+<form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="mb-3">
+        <label for="rating" class="form-label">Оценка</label>
+        <select class="form-select" id="rating" name="rating">
+            {% for value, label in options %}
+                <option value="{{ value }}"
+                    {{ 'selected' if value|string == rating|string }}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="text" class="form-label">Текст рецензии</label>
+        <textarea class="form-control" id="text" name="text" rows="8">{{ text }}</textarea>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-success">
+            <i class="bi bi-save"></i> Сохранить
+        </button>
+        <a href="{{ url_for('books.view', book_id=book.id) }}"
+           class="btn btn-secondary">Отмена</a>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+<script>
+    new EasyMDE({
+        element: document.getElementById('text'),
+        spellChecker: false,
+        status: false,
+    });
+</script>
+{% endblock %}

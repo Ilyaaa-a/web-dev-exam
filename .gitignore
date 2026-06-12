@@ -1,0 +1,17 @@
+
+ve/
+
+__pycache__/
+
+instance/
+*.db
+*.sqlite
+*.sqlite3
+
+# --- Загруженные обложки книг (пользовательские файлы) ---
+static/covers/*
+!static/covers/.gitkeep
+
+.env
+
+instance/

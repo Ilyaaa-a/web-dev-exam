@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная — Электронная библиотека{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Книги</h1>
+
+{% if pagination.items %}
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for book in pagination.items %}
+    <div class="col">
+        <div class="card h-100 shadow-sm">
+            {% if book.cover %}
+            <img src="{{ book.cover.url }}" class="card-img-top"
+                 style="height: 260px; object-fit: cover;" alt="{{ book.title }}">
+            {% else %}
+            <div class="card-img-top bg-light d-flex flex-column align-items-center
+                        justify-content-center text-muted" style="height: 260px;">
+                <i class="bi bi-image" style="font-size: 2.5rem;"></i>
+                <span class="small mt-2">Нет обложки</span>
+            </div>
+            {% endif %}
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title">{{ book.title }}</h5>
+                <div class="mb-2">
+                    {% for genre in book.genres %}
+                        <span class="badge bg-secondary">{{ genre.name }}</span>
+                    {% endfor %}
+                </div>
+                <p class="card-text text-muted mb-1">
+                    <i class="bi bi-calendar3"></i> {{ book.year }} год
+                </p>
+                <p class="card-text mb-1">
+                    <i class="bi bi-star-fill text-warning"></i>
+                    Средняя оценка: <strong>{{ book.average_rating }}</strong>
+                </p>
+                <p class="card-text mb-3">
+                    <i class="bi bi-chat-left-text"></i>
+                    Рецензий: {{ book.review_count }}
+                </p>
+
+                <div class="mt-auto d-flex gap-2">
+                    <a href="{{ url_for('books.view', book_id=book.id) }}"
+                       class="btn btn-sm btn-primary" title="Просмотр">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                    {% if current_user.is_authenticated and current_user.can_edit_book %}
+                    <a href="{{ url_for('books.edit', book_id=book.id) }}"
+                       class="btn btn-sm btn-warning" title="Редактировать">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    {% endif %}
+                    {% if current_user.is_authenticated and current_user.can_delete_book %}
+                    <button type="button" class="btn btn-sm btn-danger" title="Удалить"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteModal"
+                            data-book-id="{{ book.id }}"
+                            data-book-title="{{ book.title }}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Пагинация -->
+{% if pagination.pages > 1 %}
+<nav class="mt-4">
+    <ul class="pagination justify-content-center">
+        <li class="page-item {{ 'disabled' if not pagination.has_prev }}">
+            <a class="page-link"
+               href="{{ url_for('books.index', page=pagination.prev_num) }}">«</a>
+        </li>
+        {% for p in pagination.iter_pages() %}
+            {% if p %}
+                <li class="page-item {{ 'active' if p == pagination.page }}">
+                    <a class="page-link" href="{{ url_for('books.index', page=p) }}">{{ p }}</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+            {% endif %}
+        {% endfor %}
+        <li class="page-item {{ 'disabled' if not pagination.has_next }}">
+            <a class="page-link"
+               href="{{ url_for('books.index', page=pagination.next_num) }}">»</a>
+        </li>
+    </ul>
+</nav>
+{% endif %}
+
+{% else %}
+<div class="alert alert-info">Книги пока не добавлены.</div>
+{% endif %}
+
+{% if current_user.is_authenticated and current_user.can_create_book %}
+<div class="mt-4">
+    <a href="{{ url_for('books.add') }}" class="btn btn-success">
+        <i class="bi bi-plus-lg"></i> Добавить книгу
+    </a>
+</div>
+{% endif %}
+
+<!-- Модальное окно удаления -->
+{% if current_user.is_authenticated and current_user.can_delete_book %}
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="post" id="deleteForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Удаление книги</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Вы уверены, что хотите удалить книгу
+                    «<span id="deleteBookTitle"></span>»?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">Нет</button>
+                    <button type="submit" class="btn btn-danger">Да</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const deleteModal = document.getElementById('deleteModal');
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const bookId = button.getAttribute('data-book-id');
+            const bookTitle = button.getAttribute('data-book-title');
+            document.getElementById('deleteBookTitle').textContent = bookTitle;
+            document.getElementById('deleteForm').action =
+                '/books/' + bookId + '/delete';
+        });
+    }
+</script>
+{% endblock %}

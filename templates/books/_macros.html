@@ -1,0 +1,65 @@
+{% macro book_fields(data, genres, show_cover, cover_required=True) %}
+    {% set d = data or {} %}
+    {% set selected = d.get('selected_genre_ids', []) if data else [] %}
+
+    <div class="mb-3">
+        <label for="title" class="form-label">Название <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="title" name="title"
+               value="{{ d.get('title', '') }}" required>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label for="author" class="form-label">Автор <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="author" name="author"
+                   value="{{ d.get('author', '') }}" required>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label for="publisher" class="form-label">Издательство <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="publisher" name="publisher"
+                   value="{{ d.get('publisher', '') }}" required>
+        </div>
+        <div class="col-md-2 mb-3">
+            <label for="year" class="form-label">Год <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" id="year" name="year"
+                   min="0" max="2100" value="{{ d.get('year', '') }}" required>
+        </div>
+        <div class="col-md-2 mb-3">
+            <label for="pages" class="form-label">Объём (стр.) <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" id="pages" name="pages"
+                   min="1" value="{{ d.get('pages', '') }}" required>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="genres" class="form-label">Жанры <span class="text-danger">*</span></label>
+        <select class="form-select" id="genres" name="genres" multiple required size="6">
+            {% for genre in genres %}
+                <option value="{{ genre.id }}"
+                    {{ 'selected' if genre.id in selected }}>{{ genre.name }}</option>
+            {% endfor %}
+        </select>
+        <div class="form-text">Удерживайте Ctrl (Cmd) для выбора нескольких жанров.</div>
+    </div>
+
+    <div class="mb-3">
+        <label for="description" class="form-label">Краткое описание <span class="text-danger">*</span></label>
+        <textarea class="form-control" id="description" name="description"
+                  rows="8">{{ d.get('description', '') }}</textarea>
+    </div>
+
+    {% if show_cover %}
+    <div class="mb-3">
+        <label for="cover" class="form-label">
+            Обложка {% if cover_required %}<span class="text-danger">*</span>{% endif %}
+        </label>
+        <input type="file" class="form-control" id="cover" name="cover"
+               accept="image/*" {{ 'required' if cover_required }}>
+        {% if not cover_required %}
+        <div class="form-text">
+            Необязательно — если обложку не загрузить, будет показана заглушка.
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+{% endmacro %}

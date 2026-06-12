@@ -57,4 +57,5 @@ app = create_app()
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Сервер для разработки. Для продакшена используйте wsgi.py (waitress/gunicorn).
+    app.run(debug=app.config['DEBUG'])

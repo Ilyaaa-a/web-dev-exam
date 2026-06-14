@@ -11,8 +11,8 @@
     <div class="col">
         <div class="card h-100 shadow-sm">
             {% if book.cover %}
-            <img src="{{ book.cover.url }}" class="card-img-top"
-                 style="height: 260px; object-fit: cover;" alt="{{ book.title }}">
+            <img src="{{ book.cover.url }}" class="card-img-top bg-light p-2"
+                 style="height: 260px; object-fit: contain;" alt="{{ book.title }}">
             {% else %}
             <div class="card-img-top bg-light d-flex flex-column align-items-center
                         justify-content-center text-muted" style="height: 260px;">

@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-# Загружаем переменные окружения из файла .env (если он есть)
+# Загружаем переменные окружения из файла .env
 load_dotenv(os.path.join(basedir, '.env'))
 
 
@@ -13,10 +13,10 @@ def _env_bool(name, default=False):
 
 
 class Config:
-    # Секретный ключ берём из окружения; дефолт — только для локальной разработки
+    # Секретный ключ из окружения
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-me-please')
 
-    # Строка подключения к БД (по умолчанию — SQLite в папке instance/)
+    # Строка подключения к БД
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or (
         'sqlite:///' + os.path.join(basedir, 'instance', 'library.db')
     )
@@ -33,5 +33,5 @@ class Config:
     # Количество книг на одной странице
     BOOKS_PER_PAGE = int(os.environ.get('BOOKS_PER_PAGE', 10))
 
-    # Режим отладки (в продакшене должен быть выключен)
+    # Режим отладки
     DEBUG = _env_bool('FLASK_DEBUG', False)

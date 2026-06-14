@@ -20,7 +20,7 @@ SAVE_ERROR_MESSAGE = (
 
 
 def _collect_form_data():
-    """Считывает поля формы книги в словарь (для сохранения и повторного вывода)."""
+    # Считывает поля формы книги в словарь (для сохранения и повторного вывода)
     return {
         'title': request.form.get('title', '').strip(),
         'description': request.form.get('description', '').strip(),
@@ -35,7 +35,7 @@ def _collect_form_data():
 
 
 def _validate(data):
-    """Возвращает True, если все обязательные поля заполнены корректно."""
+    # Возвращает True, если все обязательные поля заполнены корректно
     if not all([
         data['title'], data['description'], data['year'],
         data['publisher'], data['author'], data['pages'],
@@ -49,11 +49,11 @@ def _validate(data):
 
 
 def _save_cover_file(file, book):
-    """Создаёт запись об обложке и сохраняет файл (без дублирования по MD5)."""
+    # Создаёт запись об обложке и сохраняет файл (без дублирования по MD5)
     file_bytes = file.read()
     md5_hash = hashlib.md5(file_bytes).hexdigest()
-    # Расширение определяем по MIME-типу (надёжно для любых имён файлов),
-    # с запасным вариантом — расширение из исходного имени файла.
+    # Расширение определяем по MIME-типу (тип, который браузер прислал вместе с файлом)
+    # или запасным вариантом - расширение из исходного имени файла
     ext = (
         mimetypes.guess_extension(file.mimetype or '')
         or os.path.splitext(file.filename)[1].lower()
@@ -128,7 +128,7 @@ def add():
             db.session.add(book)
             db.session.flush()  # получаем book.id
 
-            # Обложка необязательна — сохраняем, только если файл приложен
+            # Обложка необязательна - сохраняем, только если файл приложен
             cover_bytes = cover_path = None
             if has_cover:
                 cover_bytes, cover_path = _save_cover_file(file, book)
@@ -164,7 +164,7 @@ def edit(book_id):
     genres = db.session.scalars(db.select(Genre).order_by(Genre.name)).all()
 
     # Поле обложки показываем только если у книги её ещё нет
-    # (заменять уже загруженную обложку нельзя).
+    # заменять уже загруженную обложку нельзя
     show_cover = book.cover is None
 
     if request.method == 'POST':
@@ -189,7 +189,7 @@ def edit(book_id):
                 db.select(Genre).filter(Genre.id.in_(data['selected_genre_ids']))
             ).all()
 
-            # Если обложки не было и пользователь приложил файл — сохраняем
+            # Если обложки не было и пользователь приложил файл - сохраняем
             file = request.files.get('cover')
             cover_bytes = cover_path = None
             if show_cover and file is not None and file.filename != '':
@@ -212,7 +212,7 @@ def edit(book_id):
         flash('Книга успешно обновлена', 'success')
         return redirect(url_for('books.view', book_id=book.id))
 
-    # GET — заполняем форму данными книги
+    # GET — заполняет форму данными книги
     data = {
         'title': book.title,
         'description': book.description,

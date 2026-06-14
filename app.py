@@ -10,7 +10,7 @@ from extensions import csrf, db, login_manager
 
 @event.listens_for(Engine, 'connect')
 def _set_sqlite_pragma(dbapi_connection, connection_record):
-    """Включаем поддержку внешних ключей в SQLite (для ON DELETE CASCADE)."""
+    # Включаем поддержку внешних ключей в SQLite (для ON DELETE CASCADE)
     cursor = dbapi_connection.cursor()
     cursor.execute('PRAGMA foreign_keys=ON')
     cursor.close()
@@ -36,7 +36,7 @@ def create_app(config_class=Config):
     def load_user(user_id):
         return db.session.get(User, int(user_id))
 
-    # Фильтр Markdown для шаблонов (например, для текста рецензий)
+    # Фильтр Markdown для шаблонов
     app.add_template_filter(render_markdown, name='markdown')
 
     # Регистрация блюпринтов
@@ -57,5 +57,5 @@ app = create_app()
 
 
 if __name__ == '__main__':
-    # Сервер для разработки. Для продакшена используйте wsgi.py (waitress/gunicorn).
+    # Сервер для разработки
     app.run(debug=app.config['DEBUG'])

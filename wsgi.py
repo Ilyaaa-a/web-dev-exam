@@ -1,11 +1,5 @@
 """Точка входа для продакшн-сервера (WSGI).
-
-Запуск с waitress (кросс-платформенно, в т.ч. Windows):
-    python wsgi.py
-    # или
-    waitress-serve --host=0.0.0.0 --port=8000 wsgi:app
-
-Запуск с gunicorn (Linux):
+Запуск с gunicorn:
     gunicorn --bind 0.0.0.0:8000 wsgi:app
 """
 

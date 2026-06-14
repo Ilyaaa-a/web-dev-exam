@@ -12,7 +12,7 @@ ROLE_MODERATOR = 'moderator'
 ROLE_USER = 'user'
 
 
-# Соединительная таблица «многие ко многим» между книгами и жанрами
+# Соединительная таблица между книгами и жанрами
 book_genres = db.Table(
     'book_genres',
     db.Column(
@@ -30,7 +30,7 @@ book_genres = db.Table(
 )
 
 
-# Соединительная таблица «многие ко многим» между подборками и книгами
+# Соединительная таблица между подборками и книгами
 collection_books = db.Table(
     'collection_books',
     db.Column(
@@ -67,9 +67,9 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     login = db.Column(db.String(64), nullable=False, unique=True)
     password_hash = db.Column(db.String(256), nullable=False)
-    last_name = db.Column(db.String(64), nullable=False)   # фамилия
-    first_name = db.Column(db.String(64), nullable=False)  # имя
-    middle_name = db.Column(db.String(64), nullable=True)  # отчество
+    last_name = db.Column(db.String(64), nullable=False) # фамилия
+    first_name = db.Column(db.String(64), nullable=False) # имя
+    middle_name = db.Column(db.String(64), nullable=True) # отчество
     role_id = db.Column(
         db.Integer, db.ForeignKey('roles.id'), nullable=False
     )
@@ -94,7 +94,7 @@ class User(db.Model, UserMixin):
         parts = [self.last_name, self.first_name, self.middle_name or '']
         return ' '.join(p for p in parts if p).strip()
 
-    # --- Проверки прав доступа ---
+    # Проверки прав доступа
     @property
     def is_admin(self):
         return self.role is not None and self.role.name == ROLE_ADMIN
@@ -141,12 +141,12 @@ class Book(db.Model):
     __tablename__ = 'books'
 
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(256), nullable=False)        # название
-    description = db.Column(db.Text, nullable=False)         # краткое описание
-    year = db.Column(db.Integer, nullable=False)            # год
-    publisher = db.Column(db.String(256), nullable=False)   # издательство
-    author = db.Column(db.String(256), nullable=False)      # автор
-    pages = db.Column(db.Integer, nullable=False)           # объём (страниц)
+    title = db.Column(db.String(256), nullable=False) # название
+    description = db.Column(db.Text, nullable=False) # краткое описание
+    year = db.Column(db.Integer, nullable=False) # год
+    publisher = db.Column(db.String(256), nullable=False) # издательство
+    author = db.Column(db.String(256), nullable=False) # автор
+    pages = db.Column(db.Integer, nullable=False) # объём (страниц)
 
     genres = db.relationship(
         'Genre', secondary=book_genres, back_populates='books'
@@ -183,9 +183,9 @@ class Cover(db.Model):
     __tablename__ = 'covers'
 
     id = db.Column(db.Integer, primary_key=True)
-    filename = db.Column(db.String(256), nullable=False)    # название файла
-    mime_type = db.Column(db.String(128), nullable=False)   # MIME-тип
-    md5_hash = db.Column(db.String(32), nullable=False)     # MD5-хэш
+    filename = db.Column(db.String(256), nullable=False) # название файла
+    mime_type = db.Column(db.String(128), nullable=False) # MIME-тип
+    md5_hash = db.Column(db.String(32), nullable=False) # MD5-хэш
     book_id = db.Column(
         db.Integer,
         db.ForeignKey('books.id', ondelete='CASCADE'),
@@ -218,8 +218,8 @@ class Review(db.Model):
         db.ForeignKey('users.id', ondelete='CASCADE'),
         nullable=False,
     )
-    rating = db.Column(db.Integer, nullable=False)   # оценка 0..5
-    text = db.Column(db.Text, nullable=False)        # текст рецензии
+    rating = db.Column(db.Integer, nullable=False) # оценка от 0 до 5
+    text = db.Column(db.Text, nullable=False) # текст рецензии
     created_at = db.Column(
         db.DateTime, nullable=False, default=datetime.utcnow,
         server_default=func.now(),
